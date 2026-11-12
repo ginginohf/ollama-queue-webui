@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Домашний ИИ</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+    --bg:#101116;
+    --panel:#181a21;
+    --panel2:#20232c;
+    --panel3:#272b35;
+    --border:#343844;
+    --text:#f1f3f5;
+    --muted:#9ba1ad;
+    --accent:#6d8cff;
+    --danger:#ff6b6b;
+    --success:#68d391;
+}
+
+body{
+    font-family:Inter,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    height:100vh;
+    overflow:hidden;
+}
+
+button,input,textarea{font:inherit}
+
+button{
+    border:0;
+    cursor:pointer;
+}
+
+.hidden{display:none!important}
+
+/* AUTH */
+
+#auth-container{
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.auth-card{
+    width:min(390px,100%);
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:30px;
+    box-shadow:0 20px 60px #0008;
+}
+
+.auth-card h1{
+    margin-bottom:8px;
+}
+
+.auth-subtitle{
+    color:var(--muted);
+    margin-bottom:22px;
+    line-height:1.45;
+}
+
+.auth-card input{
+    width:100%;
+    margin-top:10px;
+    padding:13px 14px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:10px;
+    outline:none;
+}
+
+.auth-card input:focus{
+    border-color:var(--accent);
+}
+
+.primary{
+    background:var(--accent);
+    color:white;
+}
+
+.auth-card button{
+    width:100%;
+    padding:13px;
+    border-radius:10px;
+    margin-top:14px;
+    font-weight:700;
+}
+
+.auth-error{
+    min-height:22px;
+    margin-top:12px;
+    color:var(--danger);
+}
+
+.auth-switch{
+    margin-top:18px;
+    text-align:center;
+    color:var(--muted);
+}
+
+.auth-switch a{
+    color:#9eb0ff;
+    text-decoration:none;
+}
+
+/* APP */
+
+#app{
+    height:100vh;
+    display:flex;
+}
+
+.sidebar{
+    width:280px;
+    flex:none;
+    height:100vh;
+    background:var(--panel);
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    padding:18px;
+}
+
+.brand{
+    font-size:20px;
+    font-weight:800;
+    margin-bottom:16px;
+}
+
+.user-box{
+    color:var(--muted);
+    font-size:13px;
+    margin-bottom:15px;
+}
+
+.new-chat{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    font-weight:700;
+    margin-bottom:12px;
+}
+
+.chat-list{
+    flex:1;
+    overflow:auto;
+}
+
+.chat-item{
+    padding:11px 12px;
+    border-radius:9px;
+    color:#dfe2e8;
+    cursor:pointer;
+    margin-bottom:5px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+.chat-item:hover{
+    background:var(--panel2);
+}
+
+.chat-item.active{
+    background:var(--panel3);
+}
+
+.logout{
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    background:#3a2528;
+    color:#ffb0b0;
+}
+
+/* MAIN */
+
+.main{
+    min-width:0;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+}
+
+.topbar{
+    min-height:68px;
+    padding:12px 18px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.chat-title{
+    flex:1;
+    min-width:0;
+}
+
+.chat-title strong{
+    display:block;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.model-select{
+    width:220px;
+    background:var(--panel2);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:9px;
+}
+
+.search-toggle{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:var(--muted);
+    font-size:14px;
+    white-space:nowrap;
+}
+
+.model-warning{
+    position:absolute;
+    top:78px;
+    right:18px;
+    z-index:5;
+    max-width:470px;
+    padding:12px 14px;
+    border:1px solid #806d35;
+    background:#302b19;
+    color:#f7df91;
+    border-radius:10px;
+    font-size:13px;
+    line-height:1.4;
+    box-shadow:0 10px 30px #0005;
+}
+
+.messages{
+    flex:1;
+    overflow-y:auto;
+    padding:25px max(20px,calc((100% - 1050px)/2));
+}
+
+.message-row{
+    display:flex;
+    margin-bottom:18px;
+}
+
+.message-row.user{
+    justify-content:flex-end;
+}
+
+.message{
+    position:relative;
+    max-width:min(850px,85%);
+    padding:14px 16px;
+    border-radius:14px;
+    line-height:1.55;
+    white-space:pre-wrap;
+    word-break:break-word;
+    border:1px solid var(--border);
+}
+
+.message.user{
+    background:#2b3b76;
+    border-color:#40549a;
+}
+
+.message.assistant{
+    background:var(--panel2);
+}
+
+.message.selected{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+}
+
+.message-tools{
+    margin-top:8px;
+    font-size:12px;
+    color:var(--muted);
+    cursor:pointer;
+    user-select:none;
+}
+
+.message-tools:hover{
+    color:white;
+}
+
+.context-count{
+    color:#aebdff;
+}
+
+.empty{
+    color:var(--muted);
+    text-align:center;
+    padding:50px 20px;
+}
+
+.status{
+    margin:0 auto 10px;
+    width:min(1050px,calc(100% - 40px));
+    padding:10px 14px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    color:#dfe3ea;
+    display:none;
+}
+
+.status.visible{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.spinner{
+    width:16px;
+    height:16px;
+    border:2px solid #667080;
+    border-top-color:var(--accent);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg)}
+}
+
+/* INPUT */
+
+.input-area{
+    padding:12px max(20px,calc((100% - 1050px)/2));
+    background:var(--panel);
+    border-top:1px solid var(--border);
+}
+
+.context-info{
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:7px;
+    min-height:17px;
+}
+
+.composer{
+    display:flex;
+    gap:10px;
+}
+
+textarea{
+    flex:1;
+    min-height:55px;
+    max-height:180px;
+    resize:vertical;
+    padding:13px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:var(--panel2);
+    color:var(--text);
+    outline:none;
+}
+
+textarea:focus{
+    border-color:var(--accent);
+}
+
+.send{
+    width:110px;
+    border-radius:12px;
+    font-weight:800;
+}
+
+.send:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
+/* MOBILE */
+
+@media(max-width:800px){
+    .sidebar{
+        width:210px;
+    }
+
+    .model-select{
+        width:150px;
+    }
+
+    .message{
+        max-width:94%;
+    }
+}
+
+@media(max-width:620px){
+    .sidebar{
+        display:none;
+    }
+
+    .topbar{
+        flex-wrap:wrap;
+    }
+
+    .chat-title{
+        width:100%;
+        flex:none;
+    }
+
+    .model-select{
+        flex:1;
+    }
+
+    .search-toggle{
+        flex:none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ======================================================
+     AUTH
+====================================================== -->
+
+<div id="auth-container">
+    <div class="auth-card">
+        <h1 id="auth-title">Домашний ИИ</h1>
+        <div class="auth-subtitle" id="auth-subtitle">
+            Войдите в свой аккаунт. Чаты и запросы принадлежат
+            только текущему пользователю.
+        </div>
+
+        <form id="auth-form">
+            <input
+                id="username"
+                autocomplete="username"
+                placeholder="Логин"
+                required
+            >
+
+            <input
+                id="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Пароль"
+                required
+            >
+
+            <button class="primary" id="auth-submit">
+                Войти
+            </button>
+
+            <div class="auth-error" id="auth-error"></div>
+        </form>
+
+        <div class="auth-switch">
+            <span id="auth-switch-text">
+                Нет аккаунта?
+            </span>
+            <a href="#" id="auth-switch-link">
+                Зарегистрироваться
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<!-- ======================================================
+     APP
+====================================================== -->
+
+<div id="app" class="hidden">
+
+    <aside class="sidebar">
+        <div class="brand">🤖 Домашний ИИ</div>
+
+        <div class="user-box">
+            Вы вошли как:
+            <strong id="current-user"></strong>
+        </div>
+
+        <button
+            class="new-chat primary"
+            id="new-chat"
+        >
+            + Новый чат
+        </button>
+
+        <div
+            class="chat-list"
+            id="chat-list"
+        ></div>
+
+        <button
+            class="logout"
+            id="logout-btn"
+        >
+            Выйти
+        </button>
+    </aside>
+
+
+    <main class="main">
+
+        <header class="topbar">
+            <div class="chat-title">
+                <strong id="chat-title">
+                    Выберите чат
+                </strong>
+            </div>
+
+            <select
+                class="model-select"
+                id="model-select"
+            ></select>
+
+            <label class="search-toggle">
+                <input
+                    type="checkbox"
+                    id="search-toggle"
+                >
+                Интернет
+            </label>
+        </header>
+
+        <div
+            id="model-warning"
+            class="model-warning hidden"
+        >
+            ⚠️ После переключения модели первый запрос может
+            быть намного дольше обычного: Ollama должна загрузить
+            выбранную модель в память.
+        </div>
+
+        <section
+            class="messages"
+            id="messages"
+        ></section>
+
+        <div
+            class="status"
+            id="status"
+        >
+            <span class="spinner"></span>
+            <span id="status-text">Подготовка...</span>
+            <span id="status-extra"></span>
+        </div>
+
+        <section class="input-area">
+            <div
+                class="context-info"
+                id="context-info"
+            ></div>
+
+            <div class="composer">
+                <textarea
+                    id="prompt-input"
+                    placeholder="Введите сообщение. Enter — отправить, Shift+Enter — новая строка."
+                ></textarea>
+
+                <button
+                    class="send primary"
+                    id="send-btn"
+                >
+                    Отправить
+                </button>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+
+<script>
+"use strict";
+
+/*
+ * IMPORTANT:
+ * Task ID is stored in localStorage.
+ * Therefore page reload does NOT forget that generation is running.
+ *
+ * The server also stores the task in SQLite.
+ * Therefore /task/<id> remains available after a normal page reload.
+ */
+
+let currentUser = null;
+let currentChatId = null;
+let currentModel = "qwen3:4b";
+
+let selectedContextIds = new Set();
+
+let activeTaskId = localStorage.getItem("ai_active_task_id");
+let pollTimer = null;
+let pollingInProgress = false;
+
+let authRegisterMode = false;
+let modelWasChanged = false;
+
+
+/* DOM */
+
+const authContainer = document.getElementById("auth-container");
+const authForm = document.getElementById("auth-form");
+const authTitle = document.getElementById("auth-title");
+const authSubtitle = document.getElementById("auth-subtitle");
+const authSubmit = document.getElementById("auth-submit");
+const authError = document.getElementById("auth-error");
+const authSwitchText = document.getElementById("auth-switch-text");
+const authSwitchLink = document.getElementById("auth-switch-link");
+
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+
+const app = document.getElementById("app");
+const currentUserEl = document.getElementById("current-user");
+
+const chatList = document.getElementById("chat-list");
+const newChatButton = document.getElementById("new-chat");
+const logoutButton = document.getElementById("logout-btn");
+
+const chatTitle = document.getElementById("chat-title");
+const messagesEl = document.getElementById("messages");
+
+const modelSelect = document.getElementById("model-select");
+const searchToggle = document.getElementById("search-toggle");
+const modelWarning = document.getElementById("model-warning");
+
+const statusEl = document.getElementById("status");
+const statusText = document.getElementById("status-text");
+const statusExtra = document.getElementById("status-extra");
+
+const contextInfo = document.getElementById("context-info");
+
+const promptInput = document.getElementById("prompt-input");
+const sendButton = document.getElementById("send-btn");
+
+
+/* ==========================================================
+   API helper
+========================================================== */
+
+async function api(url, options = {}) {
+    const opts = {
+        credentials: "same-origin",
+        cache: "no-store",
+        ...options
+    };
+
+    const response = await fetch(url, opts);
+
+    let data = {};
+
+    try {
+        data = await response.json();
+    } catch (_) {
+        data = {};
+    }
+
+    if (!response.ok) {
+        const error = new Error(
+            data.error ||
+            `HTTP ${response.status}`
+        );
+
+        error.status = response.status;
+        error.data = data;
+
+        throw error;
+    }
+
+    return data;
+}
+
+
+/* ==========================================================
+   AUTH
+========================================================== */
+
+authSwitchLink.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    authRegisterMode = !authRegisterMode;
+
+    if (authRegisterMode) {
+        authTitle.textContent = "Регистрация";
+        authSubtitle.textContent =
+            "Создайте отдельный аккаунт. " +
+            "Ваши чаты будут привязаны к нему.";
+        authSubmit.textContent = "Зарегистрироваться";
+        authSwitchText.textContent = "Уже есть аккаунт?";
+        authSwitchLink.textContent = "Войти";
+        passwordInput.autocomplete = "new-password";
+    } else {
+        authTitle.textContent = "Домашний ИИ";
+        authSubtitle.textContent =
+            "Войдите в свой аккаунт. Чаты и запросы принадлежат " +
+            "только текущему пользователю.";
+        authSubmit.textContent = "Войти";
+        authSwitchText.textContent = "Нет аккаунта?";
+        authSwitchLink.textContent = "Зарегистрироваться";
+        passwordInput.autocomplete = "current-password";
+    }
+
+    authError.textContent = "";
+});
+
+
+authForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    authError.textContent = "";
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!username || !password) {
+        authError.textContent =
+            "Введите логин и пароль.";
+        return;
+    }
+
+    authSubmit.disabled = true;
+
+    try {
+        const endpoint = authRegisterMode
+            ? "/auth/register"
+            : "/auth/login";
+
+        const data = await api(endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username,
+                password
+            })
+        });
+
+        if (authRegisterMode) {
+            authRegisterMode = false;
+
+            authTitle.textContent = "Домашний ИИ";
+            authSubtitle.textContent =
+                "Аккаунт создан. Теперь войдите.";
+            authSubmit.textContent = "Войти";
+            authSwitchText.textContent = "Нет аккаунта?";
+            authSwitchLink.textContent =
+                "Зарегистрироваться";
+
+            passwordInput.value = "";
+            authError.style.color = "#68d391";
+            authError.textContent =
+                "Аккаунт создан. Теперь войдите.";
+        } else {
+            authError.style.color = "";
+            await enterApp(data.user);
+        }
+
+    } catch (error) {
+        authError.style.color = "";
+        authError.textContent =
+            error.message || "Ошибка авторизации.";
+    } finally {
+        authSubmit.disabled = false;
+    }
+});
+
+
+async function checkAuth() {
+    try {
+        const data = await api("/auth/me");
+
+        if (data.authenticated) {
+            await enterApp(data.user);
+            return true;
+        }
+
+    } catch (error) {
+        // 401 is expected for a visitor.
+        if (error.status !== 401) {
+            console.error("Auth check:", error);
+        }
+    }
+
+    showAuth();
+    return false;
+}
+
+
+async function enterApp(user) {
+    currentUser = user;
+
+    currentUserEl.textContent =
+        user.username;
+
+    authContainer.classList.add("hidden");
+    app.classList.remove("hidden");
+
+    await loadModels();
+    await loadChats();
+
+    /*
+     * If there was an active task before a page reload,
+     * recover it now.
+     */
+    if (activeTaskId) {
+        const recovered = await recoverActiveTask();
+
+        if (!recovered) {
+            activeTaskId = null;
+            localStorage.removeItem("ai_active_task_id");
+        }
+    }
+}
+
+
+function showAuth() {
+    authContainer.classList.remove("hidden");
+    app.classList.add("hidden");
+}
+
+
+logoutButton.addEventListener("click", async () => {
+    try {
+        await api("/auth/logout", {
+            method: "POST"
+        });
+    } catch (error) {
+        console.error(error);
+    }
+
+    stopPolling();
+
+    activeTaskId = null;
+    localStorage.removeItem("ai_active_task_id");
+
+    currentUser = null;
+    currentChatId = null;
+
+    showAuth();
+});
+
+
+/* ==========================================================
+   MODELS
+========================================================== */
+
+async function loadModels() {
+    try {
+        const data = await api("/models");
+
+        modelSelect.innerHTML = "";
+
+        for (const model of data.models) {
+            const option = document.createElement("option");
+
+            option.value = model.id;
+
+            option.textContent =
+                `${model.label} — ${model.average}`;
+
+            option.disabled = !model.installed;
+
+            option.title =
+                `${model.description} | ` +
+                `${model.speed}` +
+                (model.installed
+                    ? ""
+                    : " | модель не установлена");
+
+            modelSelect.appendChild(option);
+        }
+
+        const availableDefault =
+            data.models.find(
+                model =>
+                    model.id === data.default &&
+                    model.installed
+            );
+
+        if (availableDefault) {
+            currentModel = availableDefault.id;
+        } else {
+            const firstInstalled =
+                data.models.find(
+                    model => model.installed
+                );
+
+            if (firstInstalled) {
+                currentModel = firstInstalled.id;
+            }
+        }
+
+        modelSelect.value = currentModel;
+
+    } catch (error) {
+        console.error("Models:", error);
+    }
+}
+
+
+modelSelect.addEventListener("change", () => {
+    currentModel = modelSelect.value;
+    modelWasChanged = true;
+
+    modelWarning.classList.remove("hidden");
+
+    /*
+     * Warning remains visible until the next successful generation.
+     */
+    setTimeout(() => {
+        modelWarning.classList.add("hidden");
+    }, 15000);
+});
+
+
+/* ==========================================================
+   CHATS
+========================================================== */
+
+async function loadChats() {
+    try {
+        const chats = await api("/chats");
+
+        chatList.innerHTML = "";
+
+        if (!chats.length) {
+            const empty = document.createElement("div");
+
+            empty.style.color = "var(--muted)";
+            empty.style.padding = "10px 4px";
+            empty.textContent =
+                "Нет чатов. Создайте новый.";
+
+            chatList.appendChild(empty);
+
+            currentChatId = null;
+            messagesEl.innerHTML = "";
+            chatTitle.textContent = "Новый чат";
+
+            return;
+        }
+
+        for (const chat of chats) {
+            const item = document.createElement("div");
+
+            item.className = "chat-item";
+            item.dataset.id = chat.id;
+            item.textContent = chat.name;
+
+            if (chat.id === currentChatId) {
+                item.classList.add("active");
+            }
+
+            item.addEventListener(
+                "click",
+                () => selectChat(chat.id)
+            );
+
+            chatList.appendChild(item);
+        }
+
+        /*
+         * Keep current chat if possible.
+         * Otherwise use first chat.
+         */
+        const stillExists =
+            chats.some(c => c.id === currentChatId);
+
+        if (!stillExists) {
+            currentChatId = chats[0].id;
+        }
+
+        await selectChat(currentChatId);
+
+    } catch (error) {
+        console.error("Chats:", error);
+
+        if (error.status === 401) {
+            showAuth();
+        }
+    }
+}
+
+
+async function selectChat(chatId) {
+    if (activeTaskId) {
+        /*
+         * Do not cancel the server task merely because the user
+         * opens another chat.
+         */
+        await refreshTaskStatus();
+    }
+
+    currentChatId = Number(chatId);
+
+    selectedContextIds.clear();
+    updateContextInfo();
+
+    document
+        .querySelectorAll(".chat-item")
+        .forEach(item => {
+            item.classList.toggle(
+                "active",
+                Number(item.dataset.id) === currentChatId
+            );
+        });
+
+    try {
+        const messages =
+            await api(`/chats/${currentChatId}`);
+
+        messagesEl.innerHTML = "";
+
+        if (!messages.length) {
+            const empty =
+                document.createElement("div");
+
+            empty.className = "empty";
+            empty.textContent =
+                "Начните новый диалог.";
+
+            messagesEl.appendChild(empty);
+        } else {
+            for (const message of messages) {
+                renderMessage(message);
+            }
+        }
+
+        const active =
+            document.querySelector(
+                `.chat-item[data-id="${currentChatId}"]`
+            );
+
+        chatTitle.textContent =
+            active?.textContent || "Чат";
+
+        scrollMessagesToBottom();
+
+        /*
+         * Keep status visible if this is the chat
+         * belonging to the active task.
+         */
+        await refreshTaskStatus();
+
+    } catch (error) {
+        console.error("Select chat:", error);
+    }
+}
+
+
+newChatButton.addEventListener("click", async () => {
+    const name = prompt(
+        "Название чата:",
+        "Новый чат"
+    );
+
+    if (name === null) {
+        return;
+    }
+
+    try {
+        const data = await api("/chats", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name:
+                    name.trim() ||
+                    "Новый чат"
+            })
+        });
+
+        currentChatId = data.id;
+
+        await loadChats();
+
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+
+/* ==========================================================
+   MESSAGE RENDERING + CONTEXT SELECTION
+========================================================== */
+
+function renderMessage(message) {
+    const row =
+        document.createElement("div");
+
+    row.className =
+        `message-row ${message.role}`;
+
+    const bubble =
+        document.createElement("div");
+
+    bubble.className =
+        `message ${message.role}`;
+
+    bubble.dataset.messageId =
+        message.id;
+
+    bubble.textContent =
+        message.content;
+
+    row.appendChild(bubble);
+
+    /*
+     * A message can be selected as explicit context.
+     * The whole chat is NOT automatically sent to the model.
+     */
+    const tool =
+        document.createElement("div");
+
+    tool.className = "message-tools";
+
+    tool.textContent =
+        "Добавить в контекст";
+
+    tool.addEventListener("click", () => {
+        toggleContextMessage(
+            message.id,
+            bubble,
+            tool
+        );
+    });
+
+    bubble.appendChild(tool);
+
+    messagesEl.appendChild(row);
+}
+
+
+function toggleContextMessage(
+    messageId,
+    bubble,
+    tool
+) {
+    const id = Number(messageId);
+
+    if (selectedContextIds.has(id)) {
+        selectedContextIds.delete(id);
+
+        bubble.classList.remove("selected");
+        tool.textContent =
+            "Добавить в контекст";
+    } else {
+        selectedContextIds.add(id);
+
+        bubble.classList.add("selected");
+        tool.textContent =
+            "Убрать из контекста";
+    }
+
+    updateContextInfo();
+}
+
+
+function updateContextInfo() {
+    if (!selectedContextIds.size) {
+        contextInfo.textContent =
+            "Контекст: сообщения не выбраны. " +
+            "Весь чат автоматически не передаётся модели.";
+
+        return;
+    }
+
+    contextInfo.innerHTML =
+        `Выбрано сообщений для контекста: ` +
+        `<span class="context-count">${selectedContextIds.size}</span>. ` +
+        `Только они будут переданы модели.`;
+}
+
+
+function scrollMessagesToBottom() {
+    messagesEl.scrollTop =
+        messagesEl.scrollHeight;
+}
+
+
+/* ==========================================================
+   SEND
+========================================================== */
+
+sendButton.addEventListener(
+    "click",
+    sendMessage
+);
+
+
+promptInput.addEventListener(
+    "keydown",
+    event => {
+        if (
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
+            event.preventDefault();
+            sendMessage();
+        }
+    }
+);
+
+
+async function sendMessage() {
+    if (activeTaskId) {
+        return;
+    }
+
+    if (!currentChatId) {
+        alert("Сначала создайте чат.");
+        return;
+    }
+
+    const prompt =
+        promptInput.value.trim();
+
+    if (!prompt) {
+        return;
+    }
+
+    const contextIds =
+        Array.from(selectedContextIds);
+
+    promptInput.value = "";
+
+    /*
+     * Optimistic display.
+     */
+    const tempMessage = {
+        id: "temp-" + Date.now(),
+        role: "user",
+        content: prompt
+    };
+
+    const empty =
+        messagesEl.querySelector(".empty");
+
+    if (empty) {
+        empty.remove();
+    }
+
+    renderMessage(tempMessage);
+    scrollMessagesToBottom();
+
+    setBusy(true);
+    showStatus(
+        "Отправка запроса...",
+        ""
+    );
+
+    try {
+        const data =
+            await api(
+                `/chats/${currentChatId}/messages`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        prompt,
+                        model: currentModel,
+                        context_message_ids:
+                            contextIds,
+                        use_search:
+                            searchToggle.checked
+                    })
+                }
+            );
+
+        activeTaskId =
+            data.task_id;
+
+        localStorage.setItem(
+            "ai_active_task_id",
+            activeTaskId
+        );
+
+        modelWasChanged = false;
+        modelWarning.classList.add("hidden");
+
+        selectedContextIds.clear();
+        updateContextInfo();
+
+        startPolling();
+
+    } catch (error) {
+        console.error(
+            "Send:",
+            error
+        );
+
+        setBusy(false);
+
+        showStatus(
+            "Ошибка отправки",
+            error.message
+        );
+
+        setTimeout(
+            hideStatus,
+            5000
+        );
+    }
+}
+
+
+/* ==========================================================
+   TASK STATUS
+========================================================== */
+
+function setBusy(busy) {
+    sendButton.disabled = busy;
+    promptInput.disabled = busy;
+    modelSelect.disabled = busy;
+    searchToggle.disabled = busy;
+}
+
+
+function showStatus(text, extra) {
+    statusEl.classList.add("visible");
+
+    statusText.textContent =
+        text;
+
+    statusExtra.textContent =
+        extra || "";
+}
+
+
+function hideStatus() {
+    statusEl.classList.remove(
+        "visible"
+    );
+
+    statusText.textContent = "";
+    statusExtra.textContent = "";
+}
+
+
+function startPolling() {
+    stopPolling();
+
+    /*
+     * Poll immediately instead of waiting 2 seconds.
+     */
+    refreshTaskStatus();
+
+    pollTimer = setInterval(
+        refreshTaskStatus,
+        2000
+    );
+}
+
+
+function stopPolling() {
+    if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+    }
+}
+
+
+async function refreshTaskStatus() {
+    if (!activeTaskId ||
+        pollingInProgress) {
+        return false;
+    }
+
+    pollingInProgress = true;
+
+    try {
+        const task =
+            await api(
+                `/task/${activeTaskId}`
+            );
+
+        if (task.status === "queued") {
+            showStatus(
+                "В очереди",
+                task.position > 0
+                    ? `Позиция: ${task.position}`
+                    : ""
+            );
+
+            setBusy(true);
+
+        } else if (
+            task.status === "processing"
+        ) {
+            let elapsedText = "";
+
+            if (
+                typeof task.elapsed ===
+                "number"
+            ) {
+                elapsedText =
+                    `Прошло: ${formatDuration(
+                        task.elapsed
+                    )}`;
+            }
+
+            showStatus(
+                `Генерация — ${task.model_label}`,
+                elapsedText
+            );
+
+            setBusy(true);
+
+        } else if (
+            task.status === "done"
+        ) {
+            await finishTask(task);
+
+        } else if (
+            task.status === "error"
+        ) {
+            await failTask(task);
+
+        } else {
+            throw new Error(
+                "Неизвестный статус задачи."
+            );
+        }
+
+        return true;
+
+    } catch (error) {
+        console.error(
+            "Task status:",
+            error
+        );
+
+        /*
+         * IMPORTANT:
+         * We do NOT immediately cancel the task on one network
+         * failure. The task continues on the server.
+         *
+         * This is what prevents the old "вечная ошибка соединения"
+         * behaviour from losing the request.
+         */
+        showStatus(
+            "Нет связи с сервером — повторяем проверку...",
+            "Запрос на сервере не отменён"
+        );
+
+        return false;
+
+    } finally {
+        pollingInProgress = false;
+    }
+}
+
+
+async function recoverActiveTask() {
+    try {
+        const task =
+            await api(
+                `/task/${activeTaskId}`
+            );
+
+        if (task.status === "done") {
+            await finishTask(task);
+        } else if (
+            task.status === "error"
+        ) {
+            await failTask(task);
+        } else {
+            setBusy(true);
+
+            if (
+                task.status ===
+                "queued"
+            ) {
+                showStatus(
+                    "В очереди",
+                    `Позиция: ${task.position}`
+                );
+            } else {
+                showStatus(
+                    `Генерация — ${task.model_label}`,
+                    task.elapsed
+                        ? `Прошло: ${formatDuration(task.elapsed)}`
+                        : ""
+                );
+            }
+
+            startPolling();
+        }
+
+        return true;
+
+    } catch (error) {
+        console.error(
+            "Recover task:",
+            error
+        );
+
+        /*
+         * A 404 means the task really no longer exists.
+         * A temporary connection error does NOT mean that.
+         */
+        if (error.status === 404) {
+            return false;
+        }
+
+        showStatus(
+            "Восстанавливаем состояние запроса...",
+            "Повторная проверка через несколько секунд"
+        );
+
+        startPolling();
+
+        return true;
+    }
+}
+
+
+async function finishTask(task) {
+    stopPolling();
+
+    activeTaskId = null;
+    localStorage.removeItem(
+        "ai_active_task_id"
+    );
+
+    setBusy(false);
+    hideStatus();
+
+    /*
+     * Reload the current chat from the DB.
+     * This prevents duplicated optimistic messages and guarantees
+     * that the UI is identical to the server state.
+     */
+    if (currentChatId) {
+        await selectChat(
+            currentChatId
+        );
+    }
+}
+
+
+async function failTask(task) {
+    stopPolling();
+
+    activeTaskId = null;
+    localStorage.removeItem(
+        "ai_active_task_id"
+    );
+
+    setBusy(false);
+
+    showStatus(
+        "Ошибка генерации",
+        task.error ||
+            "Сервер не сообщил подробности."
+    );
+
+    /*
+     * We intentionally do not display fake text such as
+     * "модель не вернула текстовый ответ".
+     */
+}
+
+
+function formatDuration(seconds) {
+    seconds = Math.max(
+        0,
+        Math.floor(seconds)
+    );
+
+    const minutes =
+        Math.floor(seconds / 60);
+
+    const secs =
+        seconds % 60;
+
+    if (minutes < 1) {
+        return `${secs} сек`;
+    }
+
+    const hours =
+        Math.floor(minutes / 60);
+
+    const mins =
+        minutes % 60;
+
+    if (hours < 1) {
+        return `${minutes} мин ${secs} сек`;
+    }
+
+    return `${hours} ч ${mins} мин`;
+}
+
+
+/* ==========================================================
+   STARTUP
+========================================================== */
+
+(async function startup() {
+    /*
+     * Do not try /chats to determine authentication.
+     * /auth/me is explicit and much less ambiguous.
+     */
+    await checkAuth();
+})();
+
+</script>
+</body>
+</html>

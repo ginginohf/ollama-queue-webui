@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    env_file: .env
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - app-data:/data
+    restart: unless-stopped
+volumes:
+  app-data:
