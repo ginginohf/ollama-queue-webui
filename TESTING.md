@@ -1,3 +1,5 @@
-# Проверка
+# Testing
 
-См. tests/ (или test/ у Node.js). Тесты используют временные каталоги, синтетические данные и заглушки опасных операций. Они не доказывают надёжность на всех файловых системах/оборудовании. Первый запуск — на тестовой конфигурации.
+Run the command in README after installing dependencies. Tests use temporary directories, synthetic data and mocked privileged operations. They do not establish reliability on every filesystem or device. First deploy against disposable data. Screenshots are documentation fixtures, not end-to-end production tests.
+
+[Русский](TESTING.ru.md)

@@ -1,7 +1,7 @@
-## Что изменено и зачем
+## What changes and why
 
-## Как проверено
+## Validation
 
-## Совместимость и миграция
+## Compatibility and migration
 
-Подтверждаю, что изменение не содержит секретов или пользовательских данных.
+Confirm that no credentials or personal data are included.

@@ -1,62 +1,66 @@
-# Веб-интерфейс Ollama с очередью
+# Ollama Queue WebUI
 
-[![Tests](https://github.com/ginginohf/ollama-queue-webui/actions/workflows/tests.yml/badge.svg)](https://github.com/ginginohf/ollama-queue-webui/actions/workflows/tests.yml) · [MIT](LICENSE)
+**English** | [Русский](README.ru.md)
 
-Чаты, пользователи, сессии, последовательная очередь генераций и необязательный поиск через SearXNG. Внешние персональные утилиты анализа диалогов исключены.
+[![Tests](https://github.com/ginginohf/ollama-queue-webui/actions/workflows/tests.yml/badge.svg)](https://github.com/ginginohf/ollama-queue-webui/actions/workflows/tests.yml) [MIT](LICENSE)
 
-Редакция 0.1.0 под лицензией MIT. Не содержит настроек конкретного сервера и пользовательских данных. Это самостоятельная адаптация, а не побитная копия рабочего развёртывания.
+A self-hosted multi-user chat frontend for Ollama with persistent conversations and a sequential generation queue, useful when several people share one inference machine.
 
-## Требования
+## What it does
 
-Python 3.11+ с OpenSSL, Ollama с заранее загруженной моделью; SearXNG для поиска.
+- Provides registration/login, individual chat lists and persisted messages.
+- Lists configured models and lets the user choose a model for generation.
+- Queues generation work in one application process instead of launching every request simultaneously.
+- Lets the browser track task progress and recover an active task after a page reload.
+- Supports selecting message context and optional web search through SearXNG.
+- Keeps application state in SQLite; Ollama and its downloaded models remain separate services.
 
-## Развёртывание
+## Examples and screenshots
 
-Скачайте проект:
+See [worked examples](docs/EXAMPLES.md) for reproducible demonstrations and output. Examples use synthetic data; no private server configuration is included.
+
+![Application preview — synthetic demo data](docs/images/overview.png)
+
+## Requirements
+
+Python 3.11+ with OpenSSL, dependencies in requirements.txt, Ollama with an installed model; optional SearXNG.
+
+## Quick start
 
 ```sh
 git clone https://github.com/ginginohf/ollama-queue-webui.git
 cd ollama-queue-webui
-```
-
-Следующие команды выполняются из корня репозитория. Не используйте production-данные для первого запуска.
-
-```sh
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 python3 -c "import secrets; print(secrets.token_hex(32))"
-# Запишите результат как SECRET_KEY в .env. Настройте OLLAMA_URL/OLLAMA_MODEL.
+# Put the generated SECRET_KEY in .env; set OLLAMA_URL and OLLAMA_MODEL.
 gunicorn --workers 1 --threads 8 --bind 127.0.0.1:5000 --timeout 120 server:app
 ```
 
-## Настройки и ограничения
+## Configuration and limits
 
-Обязательно один worker: очередь в памяти процесса, несколько процессов создадут независимые очереди. Данные в instance/ либо AI_DATA_DIR; для бэкапа остановить процесс или применять SQLite backup API. INTERNAL_API_KEY пустой — внутренний endpoint отключён. MINECRAFT_API_KEY — необязательная интеграция. SESSION_COOKIE_SECURE=false только локальный HTTP; за HTTPS установите true. TRUST_PROXY=1 только за единственным доверенным прокси. Для Docker OLLAMA_URL должен указывать доступный из контейнера адрес, а не его127.0.0.1. Нет модели/сервиса Ollama — генерация не работает; это не поставщик модели.
+Run exactly one Gunicorn worker: the queue is in process memory and is not a distributed durable queue. A process restart does not guarantee continuation of queued work. Ollama must be reachable from the application/container. Set strong secrets; enable secure cookies behind HTTPS and trust forwarded headers only behind a trusted proxy. The UI currently uses Russian labels. Demo screenshots use fixture responses, not a live model generation.
 
-## Проверки
+`AI_DATA_DIR` selects persistent storage. An empty `INTERNAL_API_KEY` disables the internal endpoint. Set `SESSION_COOKIE_SECURE=true` for HTTPS and `TRUST_PROXY=1` only behind your trusted proxy. See `.env.example` for the full application configuration.
+
+## Tests
 
 ```sh
 python3 -m unittest discover -s tests -v
 ```
 
-Для проектов с requirements.txt сначала установите зависимости в виртуальное окружение. Результаты локальных проверок и ограничения — в TESTING.md. CI предназначен для Linux; аппаратные счётчики и реальные диски в CI не эмулируются.
+Install dependencies first when `requirements.txt` is present. See [TESTING.md](TESTING.md) for scope and limitations.
 
-## Обновление и откат
+## Documentation
 
-Сохраните конфигурацию и данные отдельно от кода. Остановите только этот экземпляр, замените код, выполните тесты, запустите снова. Не переносите тестовые базы поверх рабочих. Подробности — RESTORE.md.
+- [Examples](docs/EXAMPLES.md)
+- [Recovery and upgrades](RESTORE.md)
+- [Security](SECURITY.md)
+- [Contributing](CONTRIBUTING.md)
+- [Third-party components](THIRD_PARTY.md)
 
-## Приватность и публикация
+## License
 
-.env/config.json, базы, журналы, state и зависимости исключены из Git. Игнорирование не очищает уже закоммиченные данные: перед push повторите аудит. README-примеры не содержат действующих учётных данных. См. SECURITY.md, CONTRIBUTING.md, THIRD_PARTY.md. Собственный код распространяется по [MIT](LICENSE). Сторонние компоненты сохраняют свои условия.
-
-## Документация и обратная связь
-
-- [Проверки и их ограничения](TESTING.md)
-- [Обновление и восстановление](RESTORE.md)
-- [Безопасность и секреты](SECURITY.md)
-- [Как предложить изменение](CONTRIBUTING.md)
-- [Сторонние компоненты](THIRD_PARTY.md)
-
-Сообщая об ошибке через Issues, укажите версию ОС, команду запуска и ожидаемый результат. Удалите из журналов токены, пароли и личные данные.
+Original project code is available under the [MIT License](LICENSE). Third-party components retain their own licenses.

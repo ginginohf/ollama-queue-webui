@@ -1,4 +1,5 @@
-# Восстановление и удаление
+# Recovery and upgrades
 
-Конфигурация и рабочие данные не входят в Git. Перед обновлением сохраните их отдельно. Для отката остановите только этот экземпляр, верните предыдущий commit и совместимые зависимости, затем запустите по README. Не удаляйте рабочие данные при удалении кода.
+Configuration and runtime data are not stored in Git. Back them up separately before upgrading. Stop only this application instance, restore a compatible commit and dependencies, then start it as described in README. Keep the previous data until the replacement has been verified. Removing code should not delete your data.
 
+[Русский](RESTORE.ru.md)

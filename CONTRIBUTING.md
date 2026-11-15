@@ -1,3 +1,5 @@
 # Contributing
 
-Use synthetic fixtures only. Run the documented tests before proposing changes. Describe failure cases and rollback for changes that write files. Do not add credentials or production data. Keep third-party notices intact.
+Describe the problem and expected behavior before proposing a change. Use synthetic fixtures rather than production data. Run the tests described in README. Keep English documentation and Russian translations consistent. Include migration and compatibility notes for changes to configuration or stored data. Contributions are provided under the project MIT license.
+
+[Русский](CONTRIBUTING.ru.md)

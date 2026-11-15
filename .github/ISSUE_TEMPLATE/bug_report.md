@@ -1,16 +1,16 @@
 ---
-name: Ошибка
-about: Сообщить о воспроизводимой проблеме
+name: Bug report
+about: Report a reproducible problem
 title: ""
 labels: bug
 ---
 
-## Окружение
-ОС, версия проекта и способ запуска.
+## Environment
+OS, version and deployment method.
 
-## Шаги воспроизведения
+## Reproduction steps
 
-## Ожидаемый и фактический результат
+## Expected and actual behavior
 
-## Журнал
-Удалите секреты и личные данные перед отправкой.
+## Logs
+Remove credentials and personal data before posting.
